@@ -2,6 +2,7 @@
 #define __LOXOBJECT__
 #include<string>
 using std::string;
+#define ESP 1e-5
 class LoxObject{
 public:
     enum Type{
@@ -20,7 +21,8 @@ public:
     LoxObject(double);
     LoxObject(bool);
     LoxObject(void*);
-    bool operator==(void*);
+    bool operator==(const LoxObject&);
+    bool operator!=(const LoxObject&);
     ~LoxObject(){}
 };
 

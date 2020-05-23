@@ -1,5 +1,5 @@
-all:token.o error.o scanner.o parser.o main.o ast.o astPrinter.o loxobject.o
-	g++ token.o error.o scanner.o ast.o astPrinter.o main.o loxobject.o parser.o -o loxc
+all:token.o error.o scanner.o parser.o main.o ast.o astPrinter.o Interpreter.o loxobject.o
+	g++ token.o error.o scanner.o ast.o astPrinter.o main.o Interpreter.o loxobject.o parser.o -o loxc
 scanner.o:Scanner.cc
 	g++ Scanner.cc -c -std=c++17 -o scanner.o
 token.o:Token.cc
@@ -16,5 +16,7 @@ astPrinter.o:AstPrinter.cc
 	g++ AstPrinter.cc -c -std=c++17 -o astPrinter.o
 loxobject.o:LoxObject.cc
 	g++ LoxObject.cc -c -std=c++17 -o loxobject.o
+Interpreter.o:Interpreter.cc
+	g++ Interpreter.cc -c -std=c++17 -o Interpreter.o
 clean:
 	rm *.o

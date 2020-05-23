@@ -7,7 +7,6 @@ class Expr{
 public:
 	string parenthesize(const string& name,const initializer_list<Expr*>& exprs);
 	virtual LoxObject accept(Visitor* visitor) = 0;
-	virtual string print() = 0;
 	virtual ~Expr(){}
 };
 class Binary:public Expr{

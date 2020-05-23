@@ -21,3 +21,11 @@ void Error::error(const Token& tk,const string& msg){
     else
         report(tk.line," at '" + tk.lexeme +"'",msg);
 }
+bool Error::hadRuntimeError = false;
+void Error::runtimeError(RuntimeError error){
+    cout << error.what() << endl << "[line " << error.token.line <<"]" << endl;
+    hadRuntimeError = true;
+}
+RuntimeError::RuntimeError(const Token& _tk,const string msg):runtime_error(msg),token(_tk){
+    
+}

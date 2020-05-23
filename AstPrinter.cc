@@ -4,7 +4,7 @@ string AstPrinter::parenthesize(const string& name,const initializer_list<Expr*>
 		string ret = "(" + name;
 		for(auto& e:exprs){
 			ret += " ";
-			ret += e->print();
+			ret += e->accept(this).str;
 		}
 		ret += ")";
 		return ret;
