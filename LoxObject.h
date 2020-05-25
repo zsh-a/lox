@@ -9,21 +9,21 @@ public:
         NIL,BOOLEAN,NUMBER,STRING
     };
     Type type;
-    union 
-    {
-        string str;
-        double num;
-        bool boolean;
-    };
+
+    string str;
+    double num;
+    bool boolean;
+
     LoxObject();
-    LoxObject(const LoxObject&){};
+    LoxObject(const LoxObject&);
+    LoxObject& operator=(const LoxObject&);
     LoxObject(const string&);
     LoxObject(double);
     LoxObject(bool);
     LoxObject(void*);
     bool operator==(const LoxObject&);
     bool operator!=(const LoxObject&);
-    ~LoxObject(){}
+
 };
 
 #endif

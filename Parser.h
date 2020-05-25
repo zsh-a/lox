@@ -4,6 +4,7 @@
 #include<vector>
 #include"Error.h"
 #include"Ast.h"
+#include<memory>
 /*
     expression     → equality ;
     equality       → comparison ( ( "!=" | "==" ) comparison )* ;
@@ -54,9 +55,18 @@ public:
     // error recovery
     void synchronize();
 
-    Expr* parse();
+    shared_ptr<vector<Stmt*>> parse();
 
-    Expr* expression(){return equality();}
+    Stmt* declaration();
+    Stmt* varDeclaration();
+    Stmt* statement();
+    Stmt* printStatement();
+    Stmt* expressionStatement();
+
+    Stmt* block();
+    Expr* expression(){return assignment();}
+
+    Expr* assignment();
     Expr* equality();
     Expr* comparison();
     Expr* addition();

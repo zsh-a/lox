@@ -33,3 +33,21 @@ LoxObject::LoxObject(void*):type(NIL){
 LoxObject::LoxObject():type(NIL){
 
 }
+
+LoxObject::LoxObject(const LoxObject& _o):type(_o.type){
+    switch(type){
+        case STRING:str = _o.str;break;
+        case NUMBER:num = _o.num;break;
+        case BOOLEAN:boolean = _o.boolean;
+    }
+}
+
+LoxObject& LoxObject::operator=(const LoxObject& _o){
+    type = _o.type;
+    switch(type){
+        case STRING:str = _o.str;break;
+        case NUMBER:num = _o.num;break;
+        case BOOLEAN:boolean = _o.boolean;
+    }
+    return *this;
+}

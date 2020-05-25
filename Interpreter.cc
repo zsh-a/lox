@@ -1,5 +1,6 @@
 #include"Interpreter.h"
 #include"Error.h"
+#include<cassert>
 LoxObject Interpreter::evaluate(Expr* expr){
     return expr->accept(this);
 }
@@ -63,6 +64,7 @@ LoxObject Interpreter::visit(Grouping* expr){
 }
 
 LoxObject Interpreter::visit(Literal* expr){
+
     switch (expr->type)
     {
     case STRING:return expr->str;
@@ -70,6 +72,7 @@ LoxObject Interpreter::visit(Literal* expr){
     default:
         break;
     }
+    
 }
 
 LoxObject Interpreter::visit(Unary* expr){
@@ -85,6 +88,18 @@ LoxObject Interpreter::visit(Unary* expr){
     return nullptr;
 }
 
+
+LoxObject Interpreter::visit(Variable* expr){
+
+    return environment->get(expr->name);
+}
+
+LoxObject Interpreter::visit(Assign* expr){
+    auto value = evaluate(expr->value);
+    environment->assign(expr->name,value);
+    return value;
+}
+
 string Interpreter::stringify(const LoxObject& _o){
     if(_o.type == LoxObject::NIL) return "nil";
     if(_o.type == LoxObject::NUMBER){
@@ -95,13 +110,55 @@ string Interpreter::stringify(const LoxObject& _o){
     return _o.str;
 }
 
-void Interpreter::interpret(Expr* expr){
+
+void Interpreter::execute(Stmt* stmt){
+    stmt->accept(this);
+}
+
+void Interpreter::interpret(shared_ptr<vector<Stmt*>> stmts){
 
     try{
-        auto value = evaluate(expr);
-        cout << stringify(value) << endl;
+        for(auto stmt:*stmts){
+            execute(stmt);
+        }
     }catch(RuntimeError e){
         Error::runtimeError(e);
     }
 
+}
+
+void Interpreter::visit(Expression* expr){
+    evaluate(expr->expression);
+}
+
+void Interpreter::visit(Print* print){
+    auto obj = evaluate(print->expression);
+    cout << stringify(obj) << endl;
+}
+
+void Interpreter::visit(Var* stmt){
+    LoxObject obj;
+    
+    if(stmt->initializer){
+        
+        obj = evaluate(stmt->initializer);
+    }
+    
+    environment->define(stmt->name.lexeme,obj);
+}
+
+void Interpreter::executeBlock(Block* stmts,Environment* env){
+    auto old = environment;
+    // enter scope 
+    environment = env;
+    for(Stmt* stmt:stmts->statements){
+        execute(stmt);
+    }
+    // leavel scope
+    environment = old;
+    delete env;
+}
+
+void Interpreter::visit(Block* stmts){
+    executeBlock(stmts,new Environment(environment));
 }

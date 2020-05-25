@@ -97,7 +97,6 @@ void Scanner::number(){
 }
 // parse id
 void Scanner::identifier(){
-    
     while(isalpha(peek())){
         advance();
     }
@@ -170,7 +169,7 @@ void Scanner::scanToken(){
     }
     
 }
-const vector<Token>& Scanner::scanTokens(){
+vector<Token>& Scanner::scanTokens(){
     while(!isAtEnd()){
         start = current;
         scanToken();

@@ -26,6 +26,6 @@ public:
     void addToken(TokenType _type,const string& literal);
     void addToken(TokenType _type,double literal);
     Scanner(const string& _source);
-    const vector<Token>& scanTokens();
+    vector<Token>& scanTokens();
 };
 #endif

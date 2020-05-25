@@ -21,32 +21,34 @@ ostream& operator<<(ostream& os,const Token& tk){
 }
 
 
-void run(const string& source){
+void run(const string& source,Interpreter& inter){
     Scanner scanner{source};
-    auto& tokens = scanner.scanTokens();
-
+    //cout << source << endl;
+    auto tokens = scanner.scanTokens();
 
     Parser parser(tokens);
     auto ast = parser.parse();
     if(Error::errorNum) return;
-    Interpreter inter;
+    
     inter.interpret(ast);
     //cout << ast->print() << endl;
 }
 
 void runPrompt(){
     string s;
+    Interpreter inter;
     for(;;){
         printf("> ");
         getline(cin,s);
-        run(s);
+        run(s,inter);
     }
 }
 void runFile(const char* file){
     ifstream f(file);
     stringstream ss;
     ss << f.rdbuf();
-    run(string{ss.str()});
+    Interpreter inter;
+    run(string{ss.str()},inter);
 }
 int main(int argc,char** argv){
     if(argc == 1){

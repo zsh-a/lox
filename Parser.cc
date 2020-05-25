@@ -21,14 +21,86 @@ bool Parser::match(const initializer_list<TokenType>& arg){
     return false;
 }
 
+Stmt* Parser::printStatement(){
+    Expr* value = expression();
+    consume(SEMICOLON,"expect ';' after value.");
+    return new Print(value);
+}
 
-Expr* Parser::parse(){
+Stmt* Parser::expressionStatement(){
+    Expr* expr = expression();  
+    consume(SEMICOLON,"expect ';' after expression.");
+    return new Expression(expr);
+}
 
+Expr* Parser::assignment(){
+    Expr* expr = equality();
+    
+    if(match({EQUAL})){
+        auto& equals = previous();
+        // recursive parse 
+        Expr* value = assignment();
+        if(dynamic_cast<Variable*>(expr)){
+            const Token name = ((Variable*)expr)->name;
+            return new Assign(name,value);
+        }
+        Error::error(equals,"Invalid assignment target.");
+    }
+    return expr;
+}
+
+Stmt* Parser::block(){
+    Block* stmts = new Block;
+    while(!check(RIGHT_BRACE) && !isAtEnd()){
+        stmts->statements.push_back(declaration());
+    }
+    consume(RIGHT_BRACE,"Expect '}' after block");
+    return stmts;
+}
+
+Stmt* Parser::statement(){
+
+    if(match({PRINT})) return printStatement();
+    if(match({LEFT_BRACE})) return block();
+    return expressionStatement();
+}
+// varDecl → "var" IDENTIFIER ( "=" expression )? ";" ;
+Stmt* Parser::varDeclaration(){
+    auto& name = consume(IDENTIFIER,"Expect a variable name");
+    Expr* init = nullptr;
+    if(match({EQUAL})){
+        init = expression();
+    }
+    consume(SEMICOLON,"Expect ';' after variable declaration");
+    return new Var(name,init);
+}
+/*
+    program     → declaration* EOF ;
+
+    declaration → varDecl
+                | statement ;
+
+    statement   → exprStmt
+                | printStmt ;
+*/
+Stmt* Parser::declaration(){
     try{
-        return expression();
-    }catch(ParseError error){
+        if(match({VAR})){
+            return varDeclaration();
+        }
+        return statement();
+    }catch(ParseError e){
+        synchronize();
         return nullptr;
     }
+}
+shared_ptr<vector<Stmt*>> Parser::parse(){
+
+    auto stmts = make_shared<vector<Stmt*>>();
+    while(!isAtEnd()){
+        stmts->push_back(declaration());
+    }
+    return stmts;
 }
 Expr* Parser::equality(){
     Expr* expr = comparison();
@@ -86,6 +158,7 @@ Expr* Parser::primary(){
     if(match({NIL})) return new Literal(NIL);
     if(match({STRING})) return new Literal(previous().str);
     if(match({NUMBER})) return new Literal(previous().num);
+    if(match({IDENTIFIER})) return new Variable(previous()); 
     if(match({LEFT_PAREN})){
         Expr* expr = expression();
         consume(RIGHT_PAREN,"Expect ')' after expression");

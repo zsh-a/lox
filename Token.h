@@ -31,11 +31,10 @@ public:
     TokenType type;
     string lexeme;
 
-
-    union{
-        double num;
-        string str;
-    };
+    // !don't using union in c++
+    // token data
+    double num;
+    string str;
 
 
     int line;
@@ -46,9 +45,7 @@ public:
     Token(const Token& _tk);
     Token(TokenType _type,double _num,int _line);
     Token(TokenType _type,const string& _lexeme,const string& _str,int _line);
-    ~Token(){
 
-    }
 };
 
 
