@@ -31,6 +31,8 @@ public:
 	void visit(Print*);
     void visit(Var*);
     void visit(Block*);
+    void visit(If*);
+    void visit(While*);
     void execute(Stmt*);
     void interpret(shared_ptr<vector<Stmt*>>);
 };

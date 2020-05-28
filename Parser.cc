@@ -32,9 +32,35 @@ Stmt* Parser::expressionStatement(){
     consume(SEMICOLON,"expect ';' after expression.");
     return new Expression(expr);
 }
+/*
+    assignment → identifier "=" assignment
+           | logic_or ;
+    logic_or   → logic_and ( "or" logic_and )* ;
+    logic_and  → equality ( "and" equality )* ;
+*/
+Expr* Parser::logic_and(){
+    Expr* expr = equality();
+    while(match({AND})){
+        Token op = previous();
+        Expr* right = equality();
+        expr = new Binary(expr,op,right);
+    }
+    return expr;
+}
+
+Expr* Parser::logic_or(){
+
+    Expr* expr = logic_and();
+    while(match({OR})){
+        Token op = previous();
+        Expr* right =logic_and();
+        expr = new Binary(expr,op,right);
+    }
+    return expr;
+}
 
 Expr* Parser::assignment(){
-    Expr* expr = equality();
+    Expr* expr = logic_or();
     
     if(match({EQUAL})){
         auto& equals = previous();
@@ -58,8 +84,65 @@ Stmt* Parser::block(){
     return stmts;
 }
 
-Stmt* Parser::statement(){
+/*
+    ifStmt    → "if" "(" expression ")" statement ( "else" statement )? ;
+*/
+Stmt* Parser::ifStatement(){
+    consume(LEFT_PAREN,"Expect '(' after if.");
+    Expr* cond = expression();
+    consume(RIGHT_PAREN,"Expect ')' after if statement.");
+    Stmt* thenBranch = statement();
+    Stmt* elseBranch = nullptr;
+    if(match({ELSE})){
+        elseBranch = statement();
+    }
+    return new If(cond,thenBranch,elseBranch);
+}
 
+Stmt* Parser::whileStatement(){
+    consume(LEFT_PAREN,"Expect '(' after while.");
+    Expr* cond = expression();
+    consume(RIGHT_PAREN,"Expect ')' after while statement.");
+    Stmt* body = statement();
+    return new While(cond,body);
+}
+
+Stmt* Parser::forStatement(){
+    consume(LEFT_PAREN,"Expect '(' after for.");
+    Stmt* init;
+    if(match({SEMICOLON})){
+        init = nullptr;
+    }else if(match({VAR})){
+        init = varDeclaration();
+    }else{
+        init = expressionStatement();
+    }
+    Expr* cond = nullptr;
+    if(!check(SEMICOLON)){
+        cond = expression();
+    }
+    consume(SEMICOLON, "Expect ';' after loop condition.");
+    Expr* incr= nullptr;
+    if(!check(RIGHT_PAREN)){
+        incr = expression();
+    }
+    consume(RIGHT_PAREN, "Expect ')' after for clauses.");
+    Stmt* body = statement();
+    if(incr){
+        body = new Block{body,new Expression(incr)};
+    }
+    if(!cond) cond = new Literal(true);
+    body = new While(cond,body);
+    if(init){
+        body = new Block{init,body};
+    }
+    return body;
+}
+
+Stmt* Parser::statement(){
+    if(match({IF})) return ifStatement();
+    if(match({WHILE})) return whileStatement();
+    if(match({FOR})) return forStatement();
     if(match({PRINT})) return printStatement();
     if(match({LEFT_BRACE})) return block();
     return expressionStatement();

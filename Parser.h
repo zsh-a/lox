@@ -62,10 +62,15 @@ public:
     Stmt* statement();
     Stmt* printStatement();
     Stmt* expressionStatement();
+    Stmt* ifStatement();
+    Stmt* whileStatement();
+    Stmt* forStatement();
 
     Stmt* block();
     Expr* expression(){return assignment();}
 
+    Expr* logic_or();
+    Expr* logic_and();
     Expr* assignment();
     Expr* equality();
     Expr* comparison();

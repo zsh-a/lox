@@ -144,6 +144,28 @@ public:
 class Block:public Stmt{
 public:
 	vector<Stmt*> statements;
+	Block(){}
+	Block(initializer_list<Stmt*> _o){
+		for(auto it:_o) statements.push_back(it);
+	}
+	void accept(StmtVisitor* visitor);
+};
+
+class If:public Stmt{
+public:
+	Expr* condition;
+	Stmt* thenBranch,*elseBranch;
+	If(Expr* _condition,Stmt* _thenBranch,Stmt*_elseBranch)
+		:condition(_condition),thenBranch(_thenBranch),elseBranch(_elseBranch){}
+	void accept(StmtVisitor* visitor);
+};
+
+class While:public Stmt{
+public:
+	Expr* condition;
+	Stmt* body;
+	While(Expr* _condition,Stmt* _body)
+		:condition(_condition),body(_body){}
 	void accept(StmtVisitor* visitor);
 };
 
@@ -153,6 +175,8 @@ public:
 	virtual void visit(Print*) = 0;
 	virtual void visit(Var*) = 0;
 	virtual void visit(Block*) = 0;
+	virtual void visit(If*) = 0;
+	virtual void visit(While*) = 0;
 };
 
 

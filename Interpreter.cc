@@ -23,6 +23,15 @@ void Interpreter::checkNumberOperands(const Token& _tk,const LoxObject& _o1,cons
 
 LoxObject Interpreter::visit(Binary* expr){
     auto left = evaluate(expr->left);
+
+    if(expr->op.type == OR){
+        if(isTruthy(left)) return left;
+        else return evaluate(expr->right);
+    }else if(expr->op.type == AND){
+        if(!isTruthy(left)) return left;
+        else return evaluate(expr->right);
+    }
+
     auto right = evaluate(expr->right);
 
     switch(expr->op.type){
@@ -69,6 +78,7 @@ LoxObject Interpreter::visit(Literal* expr){
     {
     case STRING:return expr->str;
     case NUMBER: return expr->num;
+    case NIL: return LoxObject();
     default:
         break;
     }
@@ -161,4 +171,18 @@ void Interpreter::executeBlock(Block* stmts,Environment* env){
 
 void Interpreter::visit(Block* stmts){
     executeBlock(stmts,new Environment(environment));
+}
+
+void Interpreter::visit(If* stmt){
+    if(isTruthy(evaluate(stmt->condition))){
+        execute(stmt->thenBranch);
+    }else{
+        execute(stmt->elseBranch);
+    }
+}
+
+void Interpreter::visit(While* stmt){
+    while(isTruthy(evaluate(stmt->condition))){
+        execute(stmt->body);
+    }
 }

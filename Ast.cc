@@ -41,3 +41,11 @@ void Var::accept(StmtVisitor* visitor){
 void Block::accept(StmtVisitor* visitor){
 	visitor->visit(this);
 }
+
+void If::accept(StmtVisitor* visitor){
+	visitor->visit(this);
+}
+
+void While::accept(StmtVisitor* visitor){
+	visitor->visit(this);
+}
