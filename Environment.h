@@ -17,6 +17,10 @@ public:
     
     void define(const string&,const LoxObject&);
     LoxObject get(const Token&);
+    LoxObject get(const string&);
     void assign(const Token&,const LoxObject&);
+    ~Environment(){
+        
+    }
 };
 #endif

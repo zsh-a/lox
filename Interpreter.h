@@ -7,8 +7,8 @@
 #include<vector>
 class Interpreter:public Visitor,public StmtVisitor{
 public:
-
-    Environment* environment = new Environment;
+    Environment* globals = new Environment;
+    Environment* environment = globals;
 
     bool isTruthy(const LoxObject&);
 
@@ -22,6 +22,7 @@ public:
 	LoxObject visit(Unary* expr);
     LoxObject visit(Variable* expr);
     LoxObject visit(Assign* expr);
+    LoxObject visit(Call*);
     string stringify(const LoxObject&);
 
 
@@ -33,6 +34,8 @@ public:
     void visit(Block*);
     void visit(If*);
     void visit(While*);
+    void visit(Function*);
+
     void execute(Stmt*);
     void interpret(shared_ptr<vector<Stmt*>>);
 };

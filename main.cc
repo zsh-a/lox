@@ -23,7 +23,6 @@ ostream& operator<<(ostream& os,const Token& tk){
 
 void run(const string& source,Interpreter& inter){
     Scanner scanner{source};
-    //cout << source << endl;
     auto tokens = scanner.scanTokens();
 
     Parser parser(tokens);

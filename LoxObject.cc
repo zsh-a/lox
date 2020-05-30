@@ -35,19 +35,24 @@ LoxObject::LoxObject():type(NIL){
 }
 
 LoxObject::LoxObject(const LoxObject& _o):type(_o.type){
-    switch(type){
-        case STRING:str = _o.str;break;
-        case NUMBER:num = _o.num;break;
-        case BOOLEAN:boolean = _o.boolean;
-    }
+
+    str = _o.str;
+    num = _o.num;
+    boolean = _o.boolean;
+    fun = _o.fun;
 }
 
 LoxObject& LoxObject::operator=(const LoxObject& _o){
     type = _o.type;
-    switch(type){
-        case STRING:str = _o.str;break;
-        case NUMBER:num = _o.num;break;
-        case BOOLEAN:boolean = _o.boolean;
-    }
+    str = _o.str;
+    num = _o.num;
+    boolean = _o.boolean;
+    fun = _o.fun;
     return *this;
+}
+#include<iostream>
+#include"LoxFunction.h"
+using namespace std;
+LoxObject::LoxObject(LoxFunction* _fun):type(FUNCTION),fun(_fun){
+    
 }

@@ -24,8 +24,7 @@ public:
 
 	LoxObject accept(Visitor* visitor);
 	~Binary(){
-		delete left;
-		delete right;
+
 	}
 };
 class Grouping:public Expr{
@@ -35,7 +34,6 @@ public:
 
 	LoxObject accept(Visitor* visitor);
 	~Grouping() {
-		delete expression;
 	}
 };
 class Literal:public Expr{
@@ -66,7 +64,7 @@ public:
 
 	LoxObject accept(Visitor* visitor);
 	~Unary(){
-		delete right;
+
 	}
 };
 
@@ -85,6 +83,15 @@ public:
 	LoxObject accept(Visitor* visitor);
 };
 
+// function call
+class Call:public Expr{
+public:
+	Expr* callee;
+	Token paran;// used for error handle
+	vector<Expr*> args;
+	Call(const Token& _tk):paran(_tk){}
+	LoxObject accept(Visitor* visitor);
+};
 
 class Visitor{
 public:
@@ -94,6 +101,7 @@ public:
 	virtual LoxObject visit(Unary* unary) = 0;
 	virtual LoxObject visit(Variable* unary) = 0;
 	virtual LoxObject visit(Assign* unary) = 0;
+	virtual LoxObject visit(Call*) = 0;
 };
 /*
 	program     → declaration* EOF ;
@@ -117,9 +125,9 @@ class Expression :public Stmt{
 public:
 	Expr* expression;
 	Expression(Expr* expr):expression(expr){}
-	void accept(StmtVisitor* visitor);
+	void accept(StmtVisitor* visitosr);
 	~Expression(){
-		delete expression;
+
 	}
 };
 
@@ -129,7 +137,7 @@ public:
 	Print(Expr* expr):expression(expr){}
 	void accept(StmtVisitor* visitor);
 	~Print(){
-		delete expression;
+
 	}
 };
 
@@ -144,8 +152,8 @@ public:
 class Block:public Stmt{
 public:
 	vector<Stmt*> statements;
-	Block(){}
-	Block(initializer_list<Stmt*> _o){
+	Block():statements(){}
+	Block(initializer_list<Stmt*> _o):Block(){
 		for(auto it:_o) statements.push_back(it);
 	}
 	void accept(StmtVisitor* visitor);
@@ -169,6 +177,17 @@ public:
 	void accept(StmtVisitor* visitor);
 };
 
+class Function:public Stmt{
+public:
+	Token name;
+	vector<Token> params;
+	Block* body;
+	Function(const Token& _name):name(_name){
+		params = vector<Token>();
+	}
+	void accept(StmtVisitor* visitor);
+};
+
 class StmtVisitor{
 public:
 	virtual void visit(Expression*) = 0;
@@ -177,6 +196,7 @@ public:
 	virtual void visit(Block*) = 0;
 	virtual void visit(If*) = 0;
 	virtual void visit(While*) = 0;
+	virtual void visit(Function*) = 0;
 };
 
 

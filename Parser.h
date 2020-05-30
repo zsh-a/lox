@@ -66,6 +66,7 @@ public:
     Stmt* whileStatement();
     Stmt* forStatement();
 
+    Stmt* function(const string&);
     Stmt* block();
     Expr* expression(){return assignment();}
 
@@ -77,7 +78,11 @@ public:
     Expr* addition();
     Expr* multiplication();
     Expr* unary();
+    Expr* call();
+
     Expr* primary();
+
+    Expr* finishCall(Expr*);
 };
 
 

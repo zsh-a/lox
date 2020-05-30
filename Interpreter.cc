@@ -1,5 +1,6 @@
 #include"Interpreter.h"
 #include"Error.h"
+#include"LoxFunction.h"
 #include<cassert>
 LoxObject Interpreter::evaluate(Expr* expr){
     return expr->accept(this);
@@ -100,7 +101,6 @@ LoxObject Interpreter::visit(Unary* expr){
 
 
 LoxObject Interpreter::visit(Variable* expr){
-
     return environment->get(expr->name);
 }
 
@@ -185,4 +185,22 @@ void Interpreter::visit(While* stmt){
     while(isTruthy(evaluate(stmt->condition))){
         execute(stmt->body);
     }
+}
+
+LoxObject Interpreter::visit(Call* expr){
+
+    LoxObject callee = evaluate(expr->callee);
+    //cout << callee.fun->decl->name<< endl;
+    vector<LoxObject> args;
+    for(auto it:expr->args){
+        args.push_back(evaluate(it));
+    }
+    
+    return callee.fun->call(*this,args);
+}
+
+void Interpreter::visit(Function* stmt){
+    LoxFunction* fun = new LoxFunction(stmt);
+    auto obj = LoxObject(fun);
+    environment->define(stmt->name.str,obj);
 }

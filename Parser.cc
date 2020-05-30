@@ -160,8 +160,9 @@ Stmt* Parser::varDeclaration(){
 /*
     program     → declaration* EOF ;
 
-    declaration → varDecl
-                | statement ;
+    declaration → funDecl
+            | varDecl
+            | statement ;
 
     statement   → exprStmt
                 | printStmt ;
@@ -171,11 +172,30 @@ Stmt* Parser::declaration(){
         if(match({VAR})){
             return varDeclaration();
         }
+        if(match({FUN})) return function("function");
         return statement();
     }catch(ParseError e){
         synchronize();
         return nullptr;
     }
+}
+
+Stmt* Parser::function(const string& kind){
+    Token name = consume(IDENTIFIER,"Expect " + kind + " name.");
+    consume(LEFT_PAREN,"Expect '(' after " + kind + " name.");
+    Function* fun = new Function(name);
+    if(!check(RIGHT_PAREN)){
+        do{
+            if(fun->params.size() >= 255){
+                error(peek(), "Cannot have more than 255 parameters.");
+            }
+            fun->params.push_back(consume(IDENTIFIER,"Expect parameter name."));
+        }while(match({COMMA}));
+    }
+    consume(RIGHT_PAREN,"Expect ')' after parameters."); 
+
+    fun->body = (Block*)statement();
+    return fun;
 }
 shared_ptr<vector<Stmt*>> Parser::parse(){
 
@@ -226,13 +246,44 @@ Expr* Parser::multiplication(){
     return expr;
 }
 
+
+Expr* Parser::finishCall(Expr* callee){
+    Call* c = new Call(previous());
+    if(!check(RIGHT_PAREN)){
+        do{
+            if(c->args.size() >= 255)
+                error(peek(), "Cannot have more than 255 arguments.");
+            c->args.push_back(expression());
+        }while(match({COMMA}));
+    }
+    c->callee = callee;
+    c->paran = consume(RIGHT_PAREN,"Expect ')' after arguments.");
+    return c;
+}   
+/*
+    unary → ( "!" | "-" ) unary | call ;
+    call  → primary ( "(" arguments? ")" )* ;
+*/
+#include"Interpreter.h"
+Expr* Parser::call(){
+    Expr* expr = primary();
+
+    while(true){
+        if(match({LEFT_PAREN})){
+            expr = finishCall(expr);
+        }else break;
+
+    }
+    return expr;
+}
+
 Expr* Parser::unary(){
     if(match({BANG, MINUS})){
         const Token& op = previous();
         Expr* right = unary();
         return new Unary(op,right);
     }
-    return primary();
+    return call();
 }
 
 Expr* Parser::primary(){

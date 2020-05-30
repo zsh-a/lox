@@ -26,6 +26,10 @@ LoxObject Assign::accept(Visitor* visitor){
 	return visitor->visit(this);
 }
 
+LoxObject Call::accept(Visitor* visitor){
+	return visitor->visit(this);
+}
+
 void Expression::accept(StmtVisitor* visitor){
 		visitor->visit(this);
 }
@@ -47,5 +51,9 @@ void If::accept(StmtVisitor* visitor){
 }
 
 void While::accept(StmtVisitor* visitor){
+	visitor->visit(this);
+}
+
+void Function::accept(StmtVisitor* visitor){
 	visitor->visit(this);
 }
