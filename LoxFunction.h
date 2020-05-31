@@ -7,7 +7,9 @@ using namespace std;
 class LoxFunction{
 public:
     Function* decl;
-    LoxFunction(Function* _decl):decl(_decl){}
+    // for function closure
+    Environment* closure;
+    LoxFunction(Function* _decl,Environment* _closure):decl(_decl),closure(_closure){}
     LoxObject call(Interpreter&,vector<LoxObject>&);
 };
 

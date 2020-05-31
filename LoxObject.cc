@@ -34,6 +34,10 @@ LoxObject::LoxObject():type(NIL){
 
 }
 
+LoxObject::LoxObject(int v):type(INTEGER){
+    integer = v;
+}
+
 LoxObject::LoxObject(const LoxObject& _o):type(_o.type){
 
     str = _o.str;

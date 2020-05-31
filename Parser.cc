@@ -139,12 +139,21 @@ Stmt* Parser::forStatement(){
     return body;
 }
 
+Stmt* Parser::returnStatement(){
+    const Token& keyword = previous();
+    Expr* expr = nullptr;
+    if(!check(SEMICOLON)) expr = expression();
+    consume(SEMICOLON,"Expect ';' after return value."); 
+    return new Return(keyword,expr);
+}
+
 Stmt* Parser::statement(){
     if(match({IF})) return ifStatement();
     if(match({WHILE})) return whileStatement();
     if(match({FOR})) return forStatement();
     if(match({PRINT})) return printStatement();
     if(match({LEFT_BRACE})) return block();
+    if(match({RETURN})) return returnStatement();
     return expressionStatement();
 }
 // varDecl → "var" IDENTIFIER ( "=" expression )? ";" ;

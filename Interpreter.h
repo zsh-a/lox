@@ -35,9 +35,15 @@ public:
     void visit(If*);
     void visit(While*);
     void visit(Function*);
-
+    void visit(Return*);
     void execute(Stmt*);
     void interpret(shared_ptr<vector<Stmt*>>);
+};
+
+class ReturnValue{
+public:
+    LoxObject obj;
+    ReturnValue(const LoxObject& _obj):obj(_obj){}
 };
 
 #endif

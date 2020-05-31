@@ -3,6 +3,7 @@
 #include"LoxFunction.h"
 #include<cassert>
 LoxObject Interpreter::evaluate(Expr* expr){
+    if(!expr) return nullptr;
     return expr->accept(this);
 }
 
@@ -65,6 +66,7 @@ LoxObject Interpreter::visit(Binary* expr){
             checkNumberOperands(expr->op,left,right);
             return left.num <= right.num;
         case BANG_EQUAL: return left != right;
+        case EQUAL_EQUAL:return left == right;
     }
     return nullptr;
 }
@@ -122,6 +124,7 @@ string Interpreter::stringify(const LoxObject& _o){
 
 
 void Interpreter::execute(Stmt* stmt){
+    if(!stmt) return;
     stmt->accept(this);
 }
 
@@ -159,14 +162,23 @@ void Interpreter::visit(Var* stmt){
 
 void Interpreter::executeBlock(Block* stmts,Environment* env){
     auto old = environment;
-    // enter scope 
-    environment = env;
-    for(Stmt* stmt:stmts->statements){
-        execute(stmt);
+    try{
+        // enter scope 
+        environment = env;
+        for(Stmt* stmt:stmts->statements){
+            execute(stmt);
+        }
+
+    }catch(ReturnValue r){
+        // function call will throw ReturnValue Execption
+        // In order to recovery current environment to achieve this stupid method
+        // because I have no idea how to handel this problem
+        // leavel scope
+        environment = old;
+
+        throw r;
     }
-    // leavel scope
-    environment = old;
-    delete env;
+    
 }
 
 void Interpreter::visit(Block* stmts){
@@ -189,8 +201,8 @@ void Interpreter::visit(While* stmt){
 
 LoxObject Interpreter::visit(Call* expr){
 
+
     LoxObject callee = evaluate(expr->callee);
-    //cout << callee.fun->decl->name<< endl;
     vector<LoxObject> args;
     for(auto it:expr->args){
         args.push_back(evaluate(it));
@@ -200,7 +212,16 @@ LoxObject Interpreter::visit(Call* expr){
 }
 
 void Interpreter::visit(Function* stmt){
-    LoxFunction* fun = new LoxFunction(stmt);
+    LoxFunction* fun = new LoxFunction(stmt,environment);
     auto obj = LoxObject(fun);
     environment->define(stmt->name.str,obj);
+}
+
+void Interpreter::visit(Return* stmt){
+    
+    if(stmt->expr) {
+        auto ret = evaluate(stmt->expr);
+        throw ReturnValue(ret);
+    }
+    throw ReturnValue(nullptr);
 }

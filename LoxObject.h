@@ -7,13 +7,14 @@ using std::string;
 class LoxObject{
 public:
     enum Type{
-        NIL,BOOLEAN,NUMBER,STRING,FUNCTION
+        NIL,BOOLEAN,NUMBER,STRING,INTEGER,FUNCTION
     };
     Type type;
 
     string str;
     double num;
     bool boolean;
+    int integer;
     LoxFunction* fun;
 
     LoxObject();
@@ -21,6 +22,7 @@ public:
     LoxObject& operator=(const LoxObject&);
     LoxObject(const string&);
     LoxObject(double);
+    LoxObject(int);
     LoxObject(bool);
     explicit LoxObject(LoxFunction*);
     LoxObject(void*);

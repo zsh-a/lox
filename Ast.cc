@@ -57,3 +57,7 @@ void While::accept(StmtVisitor* visitor){
 void Function::accept(StmtVisitor* visitor){
 	visitor->visit(this);
 }
+
+void Return::accept(StmtVisitor* visitor){
+	visitor->visit(this);
+}

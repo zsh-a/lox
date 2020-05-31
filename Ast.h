@@ -188,6 +188,14 @@ public:
 	void accept(StmtVisitor* visitor);
 };
 
+class Return:public Stmt{
+public:
+	Token keyword;
+	Expr* expr;
+	Return(const Token& _tk,Expr* _expr):keyword(_tk),expr(_expr){}
+	void accept(StmtVisitor* visitor);
+};
+
 class StmtVisitor{
 public:
 	virtual void visit(Expression*) = 0;
@@ -197,6 +205,7 @@ public:
 	virtual void visit(If*) = 0;
 	virtual void visit(While*) = 0;
 	virtual void visit(Function*) = 0;
+	virtual void visit(Return*) = 0;
 };
 
 

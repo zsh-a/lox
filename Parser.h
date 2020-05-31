@@ -65,6 +65,7 @@ public:
     Stmt* ifStatement();
     Stmt* whileStatement();
     Stmt* forStatement();
+    Stmt* returnStatement();
 
     Stmt* function(const string&);
     Stmt* block();
