@@ -6,6 +6,7 @@
 #include"Parser.h"
 #include<sstream>
 #include"AstPrinter.h"
+#include"Resolver.h"
 #include"Interpreter.h"
 using namespace std;
 
@@ -28,7 +29,9 @@ void run(const string& source,Interpreter& inter){
     Parser parser(tokens);
     auto ast = parser.parse();
     if(Error::errorNum) return;
-    
+    Resolver resolver(inter);
+    resolver.resolve(*ast);
+    if(Error::errorNum) return;
     inter.interpret(ast);
     //cout << ast->print() << endl;
 }

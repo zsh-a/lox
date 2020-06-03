@@ -12,6 +12,7 @@ LoxObject Environment::get(const string& str){
     }
     // search in next scope
     if(enclosing) return enclosing->get(str);
+    return nullptr;
 }
 
 LoxObject Environment::get(const Token& _tk){
@@ -37,4 +38,19 @@ void Environment::assign(const Token& name,const LoxObject& obj){
     }
 
     throw RuntimeError(name,"Undefined variable '" + name.lexeme + "'.");
+}
+
+
+Environment* Environment::ancestor(int dist){
+    auto env = this;
+    for(int i = 0;i < dist;i++) env = env->enclosing;
+    return env;
+}
+LoxObject Environment::getAt(int dist,const string& name){
+    return ancestor(dist)->get(name);
+}
+
+void Environment::assignAt(int dist,const Token& name,LoxObject v){
+    ancestor(dist)->define(name.lexeme,v);
+    
 }

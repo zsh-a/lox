@@ -10,6 +10,9 @@ public:
     Environment* globals = new Environment;
     Environment* environment = globals;
 
+    // var binding
+    unordered_map<Expr*,int> locals;
+
     bool isTruthy(const LoxObject&);
 
     void checkNumberOperand(const Token&,const LoxObject&);
@@ -38,6 +41,11 @@ public:
     void visit(Return*);
     void execute(Stmt*);
     void interpret(shared_ptr<vector<Stmt*>>);
+
+    void resolve(Expr* expr,int depth);
+
+
+    LoxObject lookUpVariable(const Token& name,Expr* expr);
 };
 
 class ReturnValue{

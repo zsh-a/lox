@@ -85,7 +85,7 @@ LoxObject Interpreter::visit(Literal* expr){
     default:
         break;
     }
-    
+    return nullptr;
 }
 
 LoxObject Interpreter::visit(Unary* expr){
@@ -101,14 +101,23 @@ LoxObject Interpreter::visit(Unary* expr){
     return nullptr;
 }
 
+LoxObject Interpreter::lookUpVariable(const Token& name,Expr* expr){
+    if(!locals.count(expr)) return globals->get(name);
+    int dist = locals[expr];
+    return environment->getAt(dist,name.lexeme);
+}
 
 LoxObject Interpreter::visit(Variable* expr){
-    return environment->get(expr->name);
+    return lookUpVariable(expr->name,expr);
 }
+
 
 LoxObject Interpreter::visit(Assign* expr){
     auto value = evaluate(expr->value);
-    environment->assign(expr->name,value);
+    int dist = locals[expr];
+    if(dist){
+        environment->assignAt(dist,expr->name,value);
+    }else globals->assign(expr->name,value);
     return value;
 }
 
@@ -156,7 +165,6 @@ void Interpreter::visit(Var* stmt){
         
         obj = evaluate(stmt->initializer);
     }
-    
     environment->define(stmt->name.lexeme,obj);
 }
 
@@ -178,7 +186,7 @@ void Interpreter::executeBlock(Block* stmts,Environment* env){
 
         throw r;
     }
-    
+    environment = old;
 }
 
 void Interpreter::visit(Block* stmts){
@@ -224,4 +232,8 @@ void Interpreter::visit(Return* stmt){
         throw ReturnValue(ret);
     }
     throw ReturnValue(nullptr);
+}
+
+void Interpreter::resolve(Expr* expr,int depth){
+    locals.insert({expr,depth});
 }

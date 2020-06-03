@@ -19,6 +19,9 @@ public:
     LoxObject get(const Token&);
     LoxObject get(const string&);
     void assign(const Token&,const LoxObject&);
+    Environment* ancestor(int dist);
+    LoxObject getAt(int dist,const string& name);
+    void assignAt(int dist,const Token&,LoxObject v);
     ~Environment(){
         
     }
