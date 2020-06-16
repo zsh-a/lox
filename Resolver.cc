@@ -43,7 +43,7 @@ void Resolver::resolveLocal(Expr* expr,const Token& name){
     int n = scopes.size();
     for(int i = n-1;i >=0;--i){
         if(scopes[i].count(name.lexeme)){
-            inter.resolve(expr,n-i-1);
+            inter.resolve(expr,n - i - 1);
             return;
         }
     }
@@ -81,7 +81,7 @@ void Resolver::resolveFunction(Function* fun,FunctionType t){
         declare(it);
         define(it);
     }
-    resolve(fun->body);
+    resolve(fun->body->statements);
     endScope();
     currentFunction = enclosingFunction;
 }
