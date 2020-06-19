@@ -33,7 +33,7 @@ void run(const string& source,Interpreter& inter){
     resolver.resolve(*ast);
     if(Error::errorNum) return;
     inter.interpret(ast);
-    //cout << ast->print() << endl;
+    
 }
 
 void runPrompt(){
