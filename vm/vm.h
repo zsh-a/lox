@@ -12,14 +12,15 @@ enum InterpretResult{
 };
 
 struct VM{  
-    Chunk* chunk;
-    int ip = 0;
-    vector<Value> stk;
+	Chunk* chunk;
+	int ip = 0;
+	vector<Value> stk;
 
-    uint8_t read_byte();
-    Value read_constant();
-    InterpretResult interpret(Chunk*);
-    InterpretResult run();
+	uint8_t read_byte();
+	Value read_constant();
+	InterpretResult interpret(Chunk*);
+	InterpretResult run();
+	void clear();
 };
 
 

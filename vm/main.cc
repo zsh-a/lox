@@ -27,12 +27,16 @@
 // }
 VM vm;
 InterpretResult interpret(string& source){
+    
     Chunk chunk;
+    Scanner scanner(source);
+    Parser parser(scanner);
 
-    if(!compile(source,&chunk)) return INTERPRET_COMPILE_ERROR;
-
+    Compiler cpl(chunk,parser);
+    if(!cpl.compile()) return INTERPRET_COMPILE_ERROR;
+    chunk.disassemble("test chunk");
     vm.chunk = &chunk;
-
+    vm.ip = 0;
     InterpretResult result = vm.run();
 
     return result;
@@ -55,6 +59,7 @@ void runFile(const char* path){
 
 
 int main(int argc,char** argv){
+    
     if(argc == 1)
         repl();
     else if(argc == 2){
